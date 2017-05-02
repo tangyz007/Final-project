@@ -13,7 +13,8 @@
 #include <math.h>
 #include <vector>
 #include <fstream>
-
+#define FOOD_SIZE 100
+#define MAX_FOOD_LENGTH 100
 
 using namespace std;
 
@@ -288,6 +289,7 @@ class Food{
 		float portein;
 		float sugar;
 	public:
+	//Food();
 		Food(string n, float ca, float t, float c, float p, float s){
 			name = n;
 			cal = ca;
@@ -317,6 +319,37 @@ class Food{
 		}
 };
 
+class Foodmore:public Food{
+	public: 
+	  
+	string foodname;
+		float  caladd;
+		float fatadd;
+		float carbadd;
+		float porteinadd;
+		float sugaradd;
+		int serving_size;
+	
+	
+
+
+};
+
+
+void display(Foodmore* list,int a)
+ {
+	  int i;
+        for(i=0;i<a;i++)
+		{
+			
+            cout<<"Food name "<<(list[i].foodname);
+			printf(" calories: %f fat: %f carb:%f protein: %f sugaradd %f",(list[i].caladd),(list[i].fatadd),(list[i].carbadd),(list[i].porteinadd),(list[i].sugaradd));
+			cout << endl;
+		}
+        printf("-----------------\n");
+ }
+ 
+ 
 
 class BaseExercise{
 	private:
@@ -601,6 +634,50 @@ float weight_prediction::calculate_weight(float fix_cal, float total_cal){
 	return weight_change;
 }
 
+void append_food()
+{
+	string namefood;
+	float cal;
+		float fatt;
+		float carb;
+		float protein;
+		float sugar;
+		int serving=1;
+	cout<<"What is the name of the food that you want to add?"<<endl;
+	cin>>namefood;
+	cout<<"What is the calories of the food that you want to add?"<<endl;
+	cin>>cal;
+	cout<<"What is the fat of the food that you want to add?"<<endl;
+	cin>>fatt;
+	cout<<"What is the protein of the food that you want to add?"<<endl;
+	cin>>protein;
+	cout<<"What is the sugar of the food that you want to add?"<<endl;
+	cin>>sugar;
+	
+	
+	// FILE* fp = fopen("foodlist.txt","a");
+    // if(fp == NULL){
+        // printf("There was an error attempting to open foodlist.txt ");
+        // return;
+    // } 
+	
+    // fprintf(fp,"\n%s %d %f %f %f %f %f\n",namefood,serving,cal,fat,carb,protein, sugar);
+	// fclose(fp);
+	ofstream outfile;
+
+  outfile.open("foodlist.txt", ios_base::app);
+  outfile <<endl<<namefood<<" "<<serving<<" "<<cal<<" "<<fatt<<" "<<carb<<" "<<protein<<" "<<sugar<<endl; 
+	
+}
+
+int foodmenu()
+{
+	cout<<"Make a choice of what you want to do!"<<endl;
+	cout<<"1: See the full list of food"<<endl;
+	cout<<"2: Input the food by yourself" <<endl;
+	cout<<"3: Search for the food and select" <<endl;
+}
+
 int main(){
 	
 	double BMR_val, fix_BMR_val;
@@ -611,7 +688,10 @@ int main(){
 	fix_BMR_val = BMR_val + 500;
 	float weight = c1.getweight();
 	vector<Food> foods;
-	
+	int count=0;
+	void display(Foodmore* list,int a);	
+	int foodmenu();
+	void append_food();
 	ifstream fin("foodlist.txt", ios::in);
 
     if (fin.fail()){
@@ -626,19 +706,49 @@ int main(){
     float portein;
     float sugar;
     int serving_size;
+	int j=0;
+	int i;
+	char sel;
 
+		 
     while (fin.eof() == false){
         fin >> name >> serving_size;
         if (fin.eof()){
             break;
         }
+		//pointer[j].foodname=&name[0];
         fin >> cal1 >> fat >> carb >> portein >> sugar;
         Food food(name, cal1, fat, carb, portein, sugar);
         foods.push_back(food);
+		count++;
+		// j++;
+		
     }
+	
+	//cout<<"the count is"<<count<<endl;
+	Foodmore* pointer =(Foodmore*)malloc(sizeof(Foodmore)*FOOD_SIZE);
+	 for(j=0;j<count;j++)
+		 {
+		 
+		 pointer[j].foodname=(char*)malloc(sizeof(char)*MAX_FOOD_LENGTH);
+		 
+		 }
+		 
+		  for (i = 0; i < foods.size(); ++i){
+					pointer[i].foodname=foods[i].getName();
+					pointer[i].sugaradd=foods[i].getSugar();
+					pointer[i].porteinadd=foods[i].getPortein();
+					pointer[i].fatadd=foods[i].getFat();
+					pointer[i].caladd=foods[i].getCal();
+					pointer[i].carbadd=foods[i].getCarb();
+					
+					
+		 }
+		 
+		
 
     int choice;
-    int i;
+    
     cal1 = 0;
     carb = 0;
     fat = 0;
@@ -663,7 +773,7 @@ int main(){
 		cout << "(7)Help" << endl;
 		cout << "(8)Exit" << endl;
 		
-		int option;
+		int option,option1;
 		cout << "Enter the option" << endl;
 		cin >> option;
 		
@@ -689,11 +799,33 @@ int main(){
 			}
 			
 			case 3: {
+				foodmenu();
+				cin>>option1;
+				switch(option1){
+					case 1:{
 				
+					
+					display(pointer,count);
+					break;
+					}
+					
+					case 2:{
+				
+						append_food();
+						cout<<"Do you still want to add y/n?"<<endl;
+						cin>>sel;
+						if(sel=='y'||sel=='Y')
+							goto restart;
+						
+						break;
+					}
+					
+					case 3:
+					{
 				cout << "Please input food name: ";
 				cin >> name;
 				
-				cout << "Please input servings: ";
+				cout << "Please input servings(g): ";
 				cin >> num;
 				
 				for (i = 0; i < foods.size(); ++i){
@@ -715,6 +847,9 @@ int main(){
 					cout << "Add food successfully" << endl;
 				}
 				break;
+					}
+				}
+					break;
 			}
 			
 			case 4: {
@@ -901,3 +1036,4 @@ int main(){
 	
 	return 0;
 }
+
